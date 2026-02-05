@@ -2,10 +2,18 @@
 # @Author: JogFeelingVI
 # @Date:   2026-02-05 20:19:39
 # @Last Modified by:   JogFeelingVI
-# @Last Modified time: 2026-02-05 20:22:14
+# @Last Modified time: 2026-02-05 22:04:14
 import json
 import pathlib as pl
 from typing import Dict, Optional
+
+# https://gitee.com/jogfeelingvi/lotter_resource/raw/main/fonts/CaveatBrush-Regular.ttf
+# https://github.com/JogFeelingVI/lotter_resource/raw/refs/heads/main/fonts/CaveatBrush-Regular.ttf
+
+# https://github.com/JogFeelingVI/lotter_resource/raw/refs/heads/main/fonts/Retro%20Floral.ttf
+
+# https://github.com/JogFeelingVI/lotter_resource/raw/refs/heads/main/fonts.json
+# https://gitee.com/jogfeelingvi/lotter_resource/raw/main/fonts.json
 
 class FontManager:
     """管理并自动生成 Flet 可用的字体映射表"""
@@ -43,7 +51,8 @@ class FontManager:
                 
                 # Flet 需要的是相对于 assets 目录的路径
                 # 例如: "fonts/Roboto-Bold.ttf"
-                fonts[font_family_key] = f"{self.relative_prefix}/{file.name}"
+                fix_name_net = file.name.replace(" ","%20")
+                fonts[font_family_key] = f"/{self.relative_prefix}/{fix_name_net}"
         
         return fonts
 
@@ -51,9 +60,11 @@ class FontManager:
         return self.font_map
 
 def main():
-    print("Hello, World!")
+    print("Build Fonts to json")
     _fm = FontManager()
     print(f'fonts json {_fm.get_fonts()}')
+    with open('fonts.json', 'w', encoding='utf-8') as w:
+        json.dump(_fm.get_fonts(), w, indent=4, ensure_ascii=False)
 
 
 if __name__ == "__main__":
