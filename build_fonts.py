@@ -2,18 +2,55 @@
 # @Author: JogFeelingVI
 # @Date:   2026-02-05 20:19:39
 # @Last Modified by:   JogFeelingVI
-# @Last Modified time: 2026-02-05 22:04:14
+# @Last Modified time: 2026-02-06 08:20:46
 import json
-import pathlib as pl
+import pathlib
+import time
 from typing import Dict, Optional
 
-# https://gitee.com/jogfeelingvi/lotter_resource/raw/main/fonts/CaveatBrush-Regular.ttf
-# https://github.com/JogFeelingVI/lotter_resource/raw/refs/heads/main/fonts/CaveatBrush-Regular.ttf
 
-# https://github.com/JogFeelingVI/lotter_resource/raw/refs/heads/main/fonts/Retro%20Floral.ttf
-
-# https://github.com/JogFeelingVI/lotter_resource/raw/refs/heads/main/fonts.json
-# https://gitee.com/jogfeelingvi/lotter_resource/raw/main/fonts.json
+def version():
+    """
+    version
+    Args:
+        grid (_type_, optional): _description_. Defaults to "%Y-%m-%d %H:%M:%S".
+    """
+    grid:str="%Y-%m-%d-%H-%M-%S"
+    ts = time.time()
+    spans_map = map(int, time.strftime(grid, time.localtime(ts)).split("-"))
+    Y,m,d,h,M,s = spans_map
+    def match_js(e):
+        zgjs = ''
+        match e:
+            case 0|23:
+                zgjs = 'z'
+            case 1|2:
+                zgjs = 'c'
+            case 3|4:
+                zgjs = 'y'
+            case 5|6:
+                zgjs = 'm'
+            case 7|8:
+                zgjs = 'C'
+            case 9|10:
+                zgjs = 's'
+            case 11|12:
+                zgjs = 'w'
+            case 13|14:
+                zgjs = 'W'
+            case 15|16:
+                zgjs = 'S'
+            case 17|18:
+                zgjs = 'Y'
+            case 19|20:
+                zgjs = 'x'
+            case 21|22:
+                zgjs = 'h'
+            case _:
+                zgjs = 'P'
+        return zgjs
+    
+    return f'{m:02}{d:02}{Y}{match_js(h)}'
 
 class FontManager:
     """管理并自动生成 Flet 可用的字体映射表"""
@@ -32,7 +69,7 @@ class FontManager:
     def __find_assets_dir(self):
         """尝试自动获取 assets 目录路径"""
         # 在 Flet 安卓环境中，通常脚本运行在根目录，assets 就在同级
-        assets_path = pl.Path(__file__).parent
+        assets_path = pathlib.Path(__file__).parent
         print(f'debug: {assets_path}')
         return assets_path
 
@@ -54,6 +91,8 @@ class FontManager:
                 fix_name_net = file.name.replace(" ","%20")
                 fonts[font_family_key] = f"/{self.relative_prefix}/{fix_name_net}"
         
+        fonts['--version'] = version()
+        
         return fonts
 
     def get_fonts(self):
@@ -65,7 +104,7 @@ def main():
     print(f'fonts json {_fm.get_fonts()}')
     with open('fonts.json', 'w', encoding='utf-8') as w:
         json.dump(_fm.get_fonts(), w, indent=4, ensure_ascii=False)
-
+    
 
 if __name__ == "__main__":
     main()
